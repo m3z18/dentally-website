@@ -2,17 +2,13 @@ import "server-only";
 
 import { createClient } from "@supabase/supabase-js";
 
+import { getSupabaseServerConfig } from "@/lib/supabase/config";
 import type { Database } from "@/types/database";
 
 export function createAdminClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const { url, secretKey } = getSupabaseServerConfig();
 
-  if (!url || !serviceRoleKey) {
-    throw new Error("Supabase server environment variables are missing.");
-  }
-
-  return createClient<Database>(url, serviceRoleKey, {
+  return createClient<Database>(url, secretKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,

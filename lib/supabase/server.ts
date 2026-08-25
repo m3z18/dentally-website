@@ -3,19 +3,15 @@ import "server-only";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
+import { getSupabasePublicConfig } from "@/lib/supabase/config";
 import type { Database } from "@/types/database";
 
 export async function createClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!url || !key) {
-    throw new Error("Supabase public environment variables are missing.");
-  }
+  const { url, publicKey } = getSupabasePublicConfig();
 
   const cookieStore = await cookies();
 
-  return createServerClient<Database>(url, key, {
+  return createServerClient<Database>(url, publicKey, {
     cookies: {
       getAll() {
         return cookieStore.getAll();

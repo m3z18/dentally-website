@@ -1,14 +1,16 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+import {
+  getSupabasePublicConfig,
+  hasSupabasePublicEnv,
+} from "@/lib/supabase/config";
 import type { Database } from "@/types/database";
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  if (!url || !key) {
+  if (!hasSupabasePublicEnv()) {
     if (!request.nextUrl.pathname.startsWith("/admin/login")) {
       const loginUrl = request.nextUrl.clone();
       loginUrl.pathname = "/admin/login";
@@ -18,7 +20,9 @@ export async function updateSession(request: NextRequest) {
     return response;
   }
 
-  const supabase = createServerClient<Database>(url, key, {
+  const { url, publicKey } = getSupabasePublicConfig();
+
+  const supabase = createServerClient<Database>(url, publicKey, {
     cookies: {
       getAll() {
         return request.cookies.getAll();
