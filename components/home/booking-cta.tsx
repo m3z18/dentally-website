@@ -22,13 +22,15 @@ export function BookingCta() {
           <div className="flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:items-center lg:shrink-0">
             <Link
               href="/booking"
-              className="inline-flex min-h-13 w-full shrink-0 items-center justify-center whitespace-nowrap rounded-full bg-white px-7 py-3 text-center text-sm font-bold leading-none text-brand-dark shadow-[0_12px_28px_rgb(7_55_44/0.16)] transition-[background-color,transform,box-shadow] duration-300 hover:-translate-y-0.5 hover:bg-brand-soft hover:shadow-[0_16px_32px_rgb(7_55_44/0.2)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white sm:w-auto"
+              className="group inline-flex min-h-13 w-full shrink-0 items-center justify-center whitespace-nowrap rounded-full border border-brand-soft/80 bg-white px-7 py-3 text-center text-sm font-bold leading-none shadow-[0_12px_28px_rgb(7_55_44/0.16)] transition-[background-color,border-color,transform,box-shadow] duration-300 hover:-translate-y-0.5 hover:border-brand-dark hover:bg-brand-dark hover:shadow-[0_16px_32px_rgb(7_55_44/0.2)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white sm:w-auto"
             >
-              احجز موعدك
+              <span className="text-brand-dark transition-colors duration-300 group-hover:text-white">
+                احجز موعدك
+              </span>
             </Link>
             <Link
               href="#contact"
-              className="inline-flex min-h-13 items-center justify-center rounded-full border border-white/30 px-7 text-sm font-semibold text-white transition-[background-color,transform] duration-300 hover:-translate-y-0.5 hover:bg-white/10"
+              className="inline-flex min-h-13 w-full shrink-0 items-center justify-center whitespace-nowrap rounded-full border border-white/30 px-7 py-3 text-sm font-semibold leading-none text-white transition-[background-color,transform] duration-300 hover:-translate-y-0.5 hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white sm:w-auto"
             >
               تواصل معنا
             </Link>
