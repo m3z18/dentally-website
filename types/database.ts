@@ -94,6 +94,66 @@ export type Database = {
         Update: Partial<Database["public"]["Tables"]["blocked_times"]["Insert"]>;
         Relationships: [];
       };
+      doctors: {
+        Row: {
+          id: string;
+          slug: string;
+          name_ar: string;
+          name_en: string | null;
+          professional_title_ar: string;
+          professional_title_en: string | null;
+          specialty_ar: string;
+          specialty_en: string | null;
+          short_bio_ar: string;
+          short_bio_en: string | null;
+          bio_ar: string | null;
+          bio_en: string | null;
+          qualifications_ar: string[];
+          qualifications_en: string[];
+          expertise_ar: string[];
+          expertise_en: string[];
+          languages_ar: string[];
+          languages_en: string[];
+          image_path: string | null;
+          image_alt_ar: string | null;
+          image_alt_en: string | null;
+          display_order: number;
+          is_active: boolean;
+          deleted_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          slug: string;
+          name_ar: string;
+          name_en?: string | null;
+          professional_title_ar?: string;
+          professional_title_en?: string | null;
+          specialty_ar: string;
+          specialty_en?: string | null;
+          short_bio_ar: string;
+          short_bio_en?: string | null;
+          bio_ar?: string | null;
+          bio_en?: string | null;
+          qualifications_ar?: string[];
+          qualifications_en?: string[];
+          expertise_ar?: string[];
+          expertise_en?: string[];
+          languages_ar?: string[];
+          languages_en?: string[];
+          image_path?: string | null;
+          image_alt_ar?: string | null;
+          image_alt_en?: string | null;
+          display_order?: number;
+          is_active?: boolean;
+          deleted_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["doctors"]["Insert"]>;
+        Relationships: [];
+      };
       profiles: {
         Row: {
           id: string;

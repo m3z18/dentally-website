@@ -5,9 +5,11 @@ import { SiteLogo } from "@/components/ui/site-logo";
 
 export function AdminShell({
   adminName,
+  canManageContent,
   children,
 }: {
   adminName: string;
+  canManageContent: boolean;
   children: React.ReactNode;
 }) {
   return (
@@ -18,7 +20,7 @@ export function AdminShell({
       <aside className="hidden border-e border-line bg-surface p-6 lg:sticky lg:top-0 lg:flex lg:h-dvh lg:flex-col">
         <SiteLogo size="md" />
         <p className="mt-8 text-xs font-bold text-brand">لوحة الإدارة</p>
-        <AdminDesktopNavigation />
+        <AdminDesktopNavigation canManageContent={canManageContent} />
         <div className="mt-auto border-t border-line pt-5">
           <p className="text-xs text-muted">مسجل باسم</p>
           <p className="mt-1 text-sm font-bold text-foreground">{adminName}</p>
@@ -32,7 +34,7 @@ export function AdminShell({
         <header className="sticky top-0 z-40 border-b border-line bg-background/90 px-4 py-3 backdrop-blur lg:hidden">
           <div className="flex items-center justify-between gap-4">
             <SiteLogo size="sm" />
-            <AdminMobileNavigation />
+            <AdminMobileNavigation canManageContent={canManageContent} />
           </div>
         </header>
         <main id="admin-content" className="px-4 py-8 sm:px-6 lg:px-10 lg:py-10 xl:px-14">

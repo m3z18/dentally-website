@@ -38,3 +38,11 @@ export async function requireAdmin() {
   if (!profile) redirect("/admin/login?error=unauthorized");
   return profile;
 }
+
+export async function requireContentManager() {
+  const profile = await requireAdmin();
+  if (profile.role !== "admin" && profile.role !== "manager") {
+    redirect("/admin?error=content-permission");
+  }
+  return profile;
+}

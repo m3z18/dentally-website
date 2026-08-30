@@ -10,6 +10,7 @@ import { LogoutButton } from "@/components/admin/logout-button";
 const navigation = [
   { label: "نظرة عامة", href: "/admin" },
   { label: "المواعيد", href: "/admin/appointments" },
+  { label: "الأطباء", href: "/admin/doctors", contentManagerOnly: true },
   { label: "أوقات العمل", href: "/admin/availability" },
   { label: "الأوقات المغلقة", href: "/admin/blocked-times" },
 ];
@@ -18,12 +19,13 @@ function isActivePath(pathname: string, href: string) {
   return href === "/admin" ? pathname === href : pathname.startsWith(href);
 }
 
-export function AdminDesktopNavigation() {
+export function AdminDesktopNavigation({ canManageContent }: { canManageContent: boolean }) {
   const pathname = usePathname();
+  const visibleNavigation = navigation.filter((item) => !item.contentManagerOnly || canManageContent);
 
   return (
     <nav className="mt-5 grid gap-2" aria-label="التنقل الإداري">
-      {navigation.map((item) => {
+      {visibleNavigation.map((item) => {
         const active = isActivePath(pathname, item.href);
         return (
           <Link
@@ -40,9 +42,10 @@ export function AdminDesktopNavigation() {
   );
 }
 
-export function AdminMobileNavigation() {
+export function AdminMobileNavigation({ canManageContent }: { canManageContent: boolean }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const visibleNavigation = navigation.filter((item) => !item.contentManagerOnly || canManageContent);
 
   useEffect(() => {
     function closeOnEscape(event: KeyboardEvent) {
@@ -68,7 +71,7 @@ export function AdminMobileNavigation() {
       {open && (
         <div id="admin-mobile-menu" className="absolute end-0 top-14 w-[min(20rem,calc(100vw-2rem))] rounded-3xl border border-line bg-surface p-3 shadow-soft">
           <nav className="grid gap-1" aria-label="التنقل الإداري للجوال">
-            {navigation.map((item) => {
+            {visibleNavigation.map((item) => {
               const active = isActivePath(pathname, item.href);
               return (
                 <Link

@@ -1,5 +1,6 @@
 import { BookingCta } from "@/components/home/booking-cta";
 import { ContactPreview } from "@/components/home/contact-preview";
+import { DoctorsPreview } from "@/components/home/doctors-preview";
 import { FacilityGallery } from "@/components/home/facility-gallery";
 import { HeroSection } from "@/components/home/hero-section";
 import { ReviewsSection } from "@/components/home/reviews-section";
@@ -13,6 +14,7 @@ export default function HomePage() {
       <HeroSection />
       <ServicesPreview />
       <WhyDentally />
+      <DoctorsPreview />
       <StorySection />
       <FacilityGallery />
       <ReviewsSection />
