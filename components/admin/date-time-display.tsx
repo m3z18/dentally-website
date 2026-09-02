@@ -1,3 +1,6 @@
+"use client";
+
+import { useAdminI18n } from "@/components/admin/admin-i18n";
 import {
   formatAdminDate,
   formatAdminDateTime as formatDateTime,
@@ -15,17 +18,19 @@ export function AdminDate({
   includeWeekday = false,
   className,
 }: DisplayProps & { includeWeekday?: boolean }) {
+  const { locale, direction } = useAdminI18n();
   return (
     <time dateTime={value} className={className}>
-      <bdi dir="rtl">{formatAdminDate(value, { includeWeekday })}</bdi>
+      <bdi dir={direction}>{formatAdminDate(value, { includeWeekday, locale })}</bdi>
     </time>
   );
 }
 
 export function AdminTime({ value, className }: DisplayProps) {
+  const { locale, direction } = useAdminI18n();
   return (
     <time dateTime={value} className={className}>
-      <bdi dir="rtl">{formatAdminTime(value)}</bdi>
+      <bdi dir={direction}>{formatAdminTime(value, locale)}</bdi>
     </time>
   );
 }
@@ -41,12 +46,13 @@ export function AdminDateTime({
   includeWeekday?: boolean;
   className?: string;
 }) {
+  const { locale, direction } = useAdminI18n();
   return (
     <time
       dateTime={`${date}T${normalizeTimeValue(time)}:00+03:00`}
       className={className}
     >
-      <bdi dir="rtl">{formatDateTime(date, time, { includeWeekday })}</bdi>
+      <bdi dir={direction}>{formatDateTime(date, time, { includeWeekday, locale })}</bdi>
     </time>
   );
 }

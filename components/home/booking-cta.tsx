@@ -1,8 +1,10 @@
 import Link from "next/link";
 
 import { Container } from "@/components/ui/container";
+import { getLocale } from "@/lib/i18n";
 
-export function BookingCta() {
+export async function BookingCta() {
+  const en = (await getLocale()) === "en";
   return (
     <section className="px-page py-4 sm:py-8">
       <div className="relative mx-auto max-w-[90rem] overflow-hidden rounded-[2.5rem] bg-brand text-white shadow-[0_30px_90px_rgb(20_112_91/0.2)]">
@@ -10,12 +12,12 @@ export function BookingCta() {
         <div className="absolute -bottom-52 -end-24 size-[32rem] rounded-full border-[60px] border-white/5" aria-hidden="true" />
         <Container className="relative flex flex-col items-start gap-8 py-16 sm:py-20 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-3xl">
-            <p className="text-xs font-bold tracking-[0.1em] text-white/65">خطوتك التالية</p>
+            <p className="text-xs font-bold tracking-[0.1em] text-white/65">{en ? "Your next step" : "خطوتك التالية"}</p>
             <h2 className="mt-4 text-3xl font-bold leading-[1.3] tracking-[-0.04em] sm:text-4xl lg:text-5xl">
-              جاهز تهتم بابتسامتك؟
+              {en ? "Ready to care for your smile?" : "جاهز تهتم بابتسامتك؟"}
             </h2>
             <p className="mt-5 text-sm leading-7 text-white/70 sm:text-base">
-              احجز موعدك في Dentally خلال دقائق.
+              {en ? "Book your Dentally appointment in minutes." : "احجز موعدك في Dentally خلال دقائق."}
             </p>
           </div>
 
@@ -25,14 +27,14 @@ export function BookingCta() {
               className="group inline-flex min-h-13 w-full shrink-0 items-center justify-center whitespace-nowrap rounded-full border border-brand-soft/80 bg-white px-7 py-3 text-center text-sm font-bold leading-none shadow-[0_12px_28px_rgb(7_55_44/0.16)] transition-[background-color,border-color,transform,box-shadow] duration-300 hover:-translate-y-0.5 hover:border-brand-dark hover:bg-brand-dark hover:shadow-[0_16px_32px_rgb(7_55_44/0.2)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white sm:w-auto"
             >
               <span className="text-brand-dark transition-colors duration-300 group-hover:text-white">
-                احجز موعدك
+                {en ? "Book an appointment" : "احجز موعدك"}
               </span>
             </Link>
             <Link
-              href="#contact"
+              href="/contact"
               className="inline-flex min-h-13 w-full shrink-0 items-center justify-center whitespace-nowrap rounded-full border border-white/30 px-7 py-3 text-sm font-semibold leading-none text-white transition-[background-color,transform] duration-300 hover:-translate-y-0.5 hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white sm:w-auto"
             >
-              تواصل معنا
+              {en ? "Contact us" : "تواصل معنا"}
             </Link>
           </div>
         </Container>

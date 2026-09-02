@@ -1,0 +1,11 @@
+import Image from "next/image";
+import type { Metadata } from "next";
+import { Container } from "@/components/ui/container";
+import { getLocale, localized } from "@/lib/i18n";
+import { getPublicCollection } from "@/lib/public-collections";
+import { getSiteContentImageUrl } from "@/lib/site-content-images";
+import type { InsuranceProviderRow } from "@/types/collections";
+
+export const metadata: Metadata = { title: "شركات التأمين | Insurance Providers", description: "شركات التأمين المنشورة لدى مجمع دينتالي." };
+
+export default async function InsurancePage() { const [rows, locale] = await Promise.all([getPublicCollection("insurance_providers"), getLocale()]); const en = locale === "en"; const providers = rows as InsuranceProviderRow[]; return <Container className="py-section"><header className="max-w-3xl"><p className="text-sm font-bold text-brand">{en ? "Insurance" : "التأمين"}</p><h1 className="mt-4 text-4xl font-bold sm:text-5xl">{en ? "Insurance providers" : "شركات التأمين"}</h1><p className="mt-5 text-base leading-8 text-muted">{en ? "Coverage depends on your policy. Contact the clinic to verify benefits before your visit." : "تعتمد التغطية على وثيقتك. تواصل مع المجمع للتحقق من المنافع قبل الزيارة."}</p></header>{providers.length ? <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{providers.map((provider) => { const image = getSiteContentImageUrl(provider.image_path); const content = <>{image && <div className="relative mx-auto h-20 w-full"><Image src={image} alt={localized(locale, provider.image_alt_ar || provider.name_ar, provider.image_alt_en)} fill sizes="300px" className="object-contain" /></div>}<h2 className="mt-5 text-center font-bold">{localized(locale, provider.name_ar, provider.name_en)}</h2></>; return provider.website_url ? <a key={provider.id} href={provider.website_url} target="_blank" rel="noopener noreferrer" className="rounded-card border border-line bg-surface p-6">{content}</a> : <article key={provider.id} className="rounded-card border border-line bg-surface p-6">{content}</article>; })}</div> : <div className="mt-10 rounded-card border border-dashed border-line p-10 text-center text-sm text-muted">{en ? "No approved insurance providers are published." : "لا توجد شركات تأمين معتمدة منشورة حاليًا."}</div>}</Container>; }

@@ -5,6 +5,7 @@ import { useActionState, useState } from "react";
 import {
   updateAvailabilityAction,
 } from "@/app/admin/actions";
+import { useAdminI18n } from "@/components/admin/admin-i18n";
 import { AdminTimeInput } from "@/components/admin/localized-date-time-inputs";
 import type { AdminActionState } from "@/types/admin";
 
@@ -30,6 +31,7 @@ export function AvailabilityForm({
     initialAdminActionState,
   );
   const [enabled, setEnabled] = useState(isActive);
+  const { t, translate } = useAdminI18n();
   const messageId = `availability-message-${dayOfWeek}`;
   const hasError = state.status === "error";
 
@@ -40,26 +42,26 @@ export function AvailabilityForm({
         <h2 className="text-base font-bold text-foreground">{dayName}</h2>
         <label className="flex cursor-pointer items-center gap-2 text-xs font-bold text-muted">
           <input name="isActive" type="checkbox" checked={enabled} onChange={(event) => setEnabled(event.target.checked)} className="size-4 accent-brand" />
-          {enabled ? "مفعل" : "متوقف"}
+          {enabled ? t("مفعل", "Enabled") : t("متوقف", "Disabled")}
         </label>
       </div>
       <div className="mt-5 grid grid-cols-2 gap-3">
         <label className="grid gap-1.5 text-xs font-bold text-muted">
-          البداية
+          {t("البداية", "Start")}
           <AdminTimeInput name="startTime" defaultValue={startTime} required ariaDescribedBy={state.message ? messageId : undefined} ariaInvalid={hasError} className="min-h-11 rounded-xl border border-line bg-background px-3 text-sm font-normal text-foreground outline-none focus:border-brand" />
         </label>
         <label className="grid gap-1.5 text-xs font-bold text-muted">
-          النهاية
+          {t("النهاية", "End")}
           <AdminTimeInput name="endTime" defaultValue={endTime} required ariaDescribedBy={state.message ? messageId : undefined} ariaInvalid={hasError} className="min-h-11 rounded-xl border border-line bg-background px-3 text-sm font-normal text-foreground outline-none focus:border-brand" />
         </label>
       </div>
       <label className="mt-3 grid gap-1.5 text-xs font-bold text-muted">
-        مدة الموعد بالدقائق
+        {t("مدة الموعد بالدقائق", "Appointment duration in minutes")}
         <input name="duration" type="number" min="5" max="240" step="5" defaultValue={duration} required dir="ltr" aria-describedby={state.message ? messageId : undefined} aria-invalid={hasError} className="min-h-11 rounded-xl border border-line bg-background px-3 text-sm font-normal text-foreground outline-none focus:border-brand" />
       </label>
-      {state.message && <p id={messageId} className={`mt-3 text-xs ${state.status === "success" ? "text-brand-dark" : "text-red-700"}`} role={state.status === "error" ? "alert" : "status"}>{state.message}</p>}
+      {state.message && <p id={messageId} className={`mt-3 text-xs ${state.status === "success" ? "text-brand-dark" : "text-red-700"}`} role={state.status === "error" ? "alert" : "status"}>{translate(state.message)}</p>}
       <button type="submit" disabled={pending} className="mt-4 min-h-11 w-full cursor-pointer rounded-full bg-brand-soft px-4 text-xs font-bold text-brand-dark hover:bg-brand hover:text-white disabled:cursor-wait disabled:opacity-60">
-        {pending ? "جارٍ الحفظ..." : "حفظ اليوم"}
+        {pending ? t("جارٍ الحفظ...", "Saving...") : t("حفظ اليوم", "Save day")}
       </button>
     </form>
   );

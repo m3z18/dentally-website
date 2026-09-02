@@ -1,4 +1,5 @@
 import type { DoctorInsert } from "@/types/doctor";
+import { isUuid } from "@/lib/validation/admin";
 
 export type DoctorFormResult =
   | { success: true; data: DoctorInsert }
@@ -36,6 +37,7 @@ export function parseDoctorForm(formData: FormData): DoctorFormResult {
   const professionalTitleEn = readText(formData, "professionalTitleEn");
   const specialtyAr = readText(formData, "specialtyAr");
   const specialtyEn = readText(formData, "specialtyEn");
+  const specialtyId = readText(formData, "specialtyId");
   const shortBioAr = readText(formData, "shortBioAr");
   const shortBioEn = readText(formData, "shortBioEn");
   const bioAr = readText(formData, "bioAr");
@@ -78,6 +80,10 @@ export function parseDoctorForm(formData: FormData): DoctorFormResult {
     return { success: false, message: "تحقق من التخصص بالإنجليزية." };
   }
 
+  if (specialtyId && !isUuid(specialtyId)) {
+    return { success: false, message: "التخصص المختار غير صالح." };
+  }
+
   if (shortBioAr.length < 10 || shortBioAr.length > 320) {
     return { success: false, message: "النبذة المختصرة يجب أن تكون بين 10 و320 حرفًا." };
   }
@@ -112,6 +118,7 @@ export function parseDoctorForm(formData: FormData): DoctorFormResult {
       professional_title_en: optionalText(professionalTitleEn),
       specialty_ar: specialtyAr,
       specialty_en: optionalText(specialtyEn),
+      specialty_id: optionalText(specialtyId),
       short_bio_ar: shortBioAr,
       short_bio_en: optionalText(shortBioEn),
       bio_ar: optionalText(bioAr),

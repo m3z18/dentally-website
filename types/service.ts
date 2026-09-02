@@ -9,6 +9,14 @@ export type DentalService = {
   needIndicators: string[];
   visitExpectations: string[];
   faq: ServiceFaq[];
+  titleEn?: string;
+  descriptionEn?: string;
+  introEn?: string;
+  bookingEnabled?: boolean;
+  imageUrl?: string | null;
+  imageAlt?: string | null;
+  seoTitle?: string | null;
+  seoDescription?: string | null;
 };
 
 export type ServiceFaq = {

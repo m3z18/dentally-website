@@ -32,22 +32,22 @@ export function resolveBookingServiceId(value?: string) {
   return bookingServiceAliases[value] ?? "";
 }
 
-export function createBookingDates(referenceDate = new Date()): BookingDateOption[] {
+export function createBookingDates(referenceDate = new Date(), locale: "ar" | "en" = "ar"): BookingDateOption[] {
   return Array.from({ length: 21 }, (_, index) => {
     const value = addDaysToDate(getRiyadhDateValue(referenceDate), index);
     const date = new Date(`${value}T12:00:00Z`);
 
     return {
       value,
-      dayName: new Intl.DateTimeFormat("ar-SA-u-ca-gregory", {
+      dayName: new Intl.DateTimeFormat(locale === "en" ? "en-SA" : "ar-SA-u-ca-gregory", {
         weekday: "short",
         timeZone: "UTC",
       }).format(date),
-      dayNumber: new Intl.DateTimeFormat("ar-SA-u-ca-gregory", {
+      dayNumber: new Intl.DateTimeFormat(locale === "en" ? "en-SA" : "ar-SA-u-ca-gregory", {
         day: "numeric",
         timeZone: "UTC",
       }).format(date),
-      monthName: new Intl.DateTimeFormat("ar-SA-u-ca-gregory", {
+      monthName: new Intl.DateTimeFormat(locale === "en" ? "en-SA" : "ar-SA-u-ca-gregory", {
         month: "short",
         timeZone: "UTC",
       }).format(date),
@@ -56,12 +56,12 @@ export function createBookingDates(referenceDate = new Date()): BookingDateOptio
   });
 }
 
-export function formatBookingDate(value: string) {
-  if (!value) return "لم يُحدد";
+export function formatBookingDate(value: string, locale: "ar" | "en" = "ar") {
+  if (!value) return locale === "en" ? "Not selected" : "لم يُحدد";
   const [year, month, day] = value.split("-").map(Number);
   const date = new Date(year, month - 1, day, 12);
 
-  return new Intl.DateTimeFormat("ar-SA-u-ca-gregory", {
+  return new Intl.DateTimeFormat(locale === "en" ? "en-SA" : "ar-SA-u-ca-gregory", {
     weekday: "long",
     day: "numeric",
     month: "long",

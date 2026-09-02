@@ -9,12 +9,13 @@ import {
   getDoctorImagePublicUrl,
 } from "@/lib/doctor-images";
 import type { AdminActionState, DoctorRow } from "@/types/admin";
+import type { SpecialtyRow } from "@/types/catalog";
 
 const initialState: AdminActionState = { status: "idle", message: "" };
 const fieldClasses = "min-h-12 rounded-xl border border-line bg-background px-3.5 text-sm font-normal text-foreground outline-none transition-colors focus:border-brand";
 const textareaClasses = `${fieldClasses} min-h-32 resize-y py-3 leading-7`;
 
-export function DoctorForm({ doctor }: { doctor?: DoctorRow }) {
+export function DoctorForm({ doctor, specialties = [] }: { doctor?: DoctorRow; specialties?: SpecialtyRow[] }) {
   const action = doctor ? updateDoctorAction : createDoctorAction;
   const [state, formAction, pending] = useActionState(action, initialState);
   const messageId = doctor ? `doctor-form-message-${doctor.id}` : "doctor-form-message-new";
@@ -69,6 +70,12 @@ export function DoctorForm({ doctor }: { doctor?: DoctorRow }) {
           </Field>
           <Field label="التخصص">
             <input name="specialtyAr" defaultValue={doctor?.specialty_ar ?? ""} minLength={2} maxLength={160} required aria-invalid={hasError} className={fieldClasses} />
+          </Field>
+          <Field label="تصنيف التخصص" hint="ربط محتوى اختياري، لا يؤثر في الحجز">
+            <select name="specialtyId" defaultValue={doctor?.specialty_id ?? ""} className={fieldClasses}>
+              <option value="">بدون ربط</option>
+              {specialties.filter((item) => !item.deleted_at).map((item) => <option key={item.id} value={item.id}>{item.name_ar}</option>)}
+            </select>
           </Field>
           <Field label="الرابط المختصر" hint="أحرف إنجليزية صغيرة وأرقام وشرطات">
             <input name="slug" defaultValue={doctor?.slug ?? ""} minLength={2} maxLength={80} pattern="[a-z0-9]+(?:-[a-z0-9]+)*" required dir="ltr" spellCheck={false} aria-invalid={hasError} className={fieldClasses} />

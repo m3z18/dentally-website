@@ -36,6 +36,31 @@ const adminTimeFormatter = new Intl.DateTimeFormat("ar-SA", {
   timeZone: "Asia/Riyadh",
 });
 
+const adminEnglishDateFormatter = new Intl.DateTimeFormat("en-GB", {
+  calendar: "gregory",
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+  timeZone: "Asia/Riyadh",
+});
+
+const adminEnglishDateWithWeekdayFormatter = new Intl.DateTimeFormat("en-GB", {
+  calendar: "gregory",
+  weekday: "long",
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+  timeZone: "Asia/Riyadh",
+});
+
+const adminEnglishTimeFormatter = new Intl.DateTimeFormat("en-GB", {
+  calendar: "gregory",
+  hour: "numeric",
+  minute: "2-digit",
+  hour12: true,
+  timeZone: "Asia/Riyadh",
+});
+
 function parseDateValue(value: string) {
   const [year, month, day] = value.split("-").map(Number);
 
@@ -119,30 +144,46 @@ export function formatArabicTime(value: string) {
 
 export function formatAdminDate(
   value: string,
-  options: { includeWeekday?: boolean } = {},
+  options: { includeWeekday?: boolean; locale?: "ar" | "en" } = {},
 ) {
   const date = parseDateValue(value);
-  if (!date) return "تاريخ غير صالح";
+  if (!date) return options.locale === "en" ? "Invalid date" : "تاريخ غير صالح";
 
-  return (options.includeWeekday
-    ? adminDateWithWeekdayFormatter
-    : adminDateFormatter
-  ).format(date);
+  const formatter = options.locale === "en"
+    ? (options.includeWeekday ? adminEnglishDateWithWeekdayFormatter : adminEnglishDateFormatter)
+    : (options.includeWeekday ? adminDateWithWeekdayFormatter : adminDateFormatter);
+  return formatter.format(date);
 }
 
-export function formatAdminTime(value: string) {
+export function formatAdminTime(value: string, locale: "ar" | "en" = "ar") {
   const date = parseRiyadhTimeValue(value);
-  return date ? adminTimeFormatter.format(date) : "وقت غير صالح";
+  return date
+    ? (locale === "en" ? adminEnglishTimeFormatter : adminTimeFormatter).format(date)
+    : (locale === "en" ? "Invalid time" : "وقت غير صالح");
 }
 
 export function formatAdminDateTime(
   dateValue: string,
   timeValue: string,
-  options: { includeWeekday?: boolean } = {},
+  options: { includeWeekday?: boolean; locale?: "ar" | "en" } = {},
 ) {
-  return `${formatAdminDate(dateValue, options)} — ${formatAdminTime(timeValue)}`;
+  return `${formatAdminDate(dateValue, options)} — ${formatAdminTime(timeValue, options.locale)}`;
 }
 
 export function normalizeTimeValue(value: string) {
   return value.slice(0, 5);
+}
+
+export function parseRiyadhDateTimeInput(value:string){
+  if(!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value))return null;
+  const [datePart,timePart]=value.split("T");const [year,month,day]=datePart.split("-").map(Number);const [hour,minute]=timePart.split(":").map(Number);
+  const instant=new Date(Date.UTC(year,month-1,day,hour-3,minute));
+  return formatRiyadhDateTimeInput(instant.toISOString())===value?instant.toISOString():null;
+}
+
+export function formatRiyadhDateTimeInput(value?:string|null){
+  if(!value)return "";const date=new Date(value);if(Number.isNaN(date.getTime()))return "";
+  const parts=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Riyadh",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).formatToParts(date);
+  const part=(type:Intl.DateTimeFormatPartTypes)=>parts.find(item=>item.type===type)?.value??"";
+  return `${part("year")}-${part("month")}-${part("day")}T${part("hour")}:${part("minute")}`;
 }

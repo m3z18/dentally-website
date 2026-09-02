@@ -8,6 +8,7 @@ import { requireContentManager } from "@/lib/auth/admin";
 import { createClient } from "@/lib/supabase/server";
 import { isUuid } from "@/lib/validation/admin";
 import type { DoctorRow } from "@/types/admin";
+import type { SpecialtyRow } from "@/types/catalog";
 
 export default async function EditDoctorPage({ params }: PageProps<"/admin/doctors/[id]">) {
   await requireContentManager();
@@ -15,7 +16,10 @@ export default async function EditDoctorPage({ params }: PageProps<"/admin/docto
   if (!isUuid(id)) notFound();
 
   const supabase = await createClient();
-  const { data, error } = await supabase.from("doctors").select("*").eq("id", id).maybeSingle();
+  const [{ data, error }, { data: specialties }] = await Promise.all([
+    supabase.from("doctors").select("*").eq("id", id).maybeSingle(),
+    supabase.from("specialties").select("*").order("display_order"),
+  ]);
   if (error || !data) notFound();
   const doctor = data as DoctorRow;
 
@@ -29,7 +33,7 @@ export default async function EditDoctorPage({ params }: PageProps<"/admin/docto
         <DoctorRestoreForm doctorId={doctor.id} />
       ) : (
         <>
-          <DoctorForm doctor={doctor} />
+          <DoctorForm doctor={doctor} specialties={(specialties ?? []) as SpecialtyRow[]} />
           <DoctorSoftDeleteForm doctorId={doctor.id} doctorName={`${doctor.professional_title_ar} ${doctor.name_ar}`} />
         </>
       )}

@@ -2,6 +2,7 @@
 
 import { useState, type MouseEvent } from "react";
 
+import { useAdminI18n } from "@/components/admin/admin-i18n";
 import { formatAdminDate, formatAdminTime } from "@/lib/date";
 
 type SharedInputProps = {
@@ -22,10 +23,11 @@ export function AdminDateInput({
   ariaDescribedBy,
   ariaInvalid,
 }: SharedInputProps & { min?: string }) {
+  const { locale, direction, t } = useAdminI18n();
   const [value, setValue] = useState(defaultValue);
   const displayValue = value
-    ? formatAdminDate(value, { includeWeekday: true })
-    : "اختر التاريخ";
+    ? formatAdminDate(value, { includeWeekday: true, locale })
+    : t("اختر التاريخ", "Choose date");
 
   function openDatePicker(event: MouseEvent<HTMLInputElement>) {
     event.currentTarget.showPicker?.();
@@ -39,7 +41,7 @@ export function AdminDateInput({
         className={`pointer-events-none min-w-0 flex-1 truncate text-start ${value ? "pe-8 text-foreground" : "text-muted"}`}
         aria-hidden="true"
       >
-        <bdi dir="rtl">{displayValue}</bdi>
+        <bdi dir={direction}>{displayValue}</bdi>
       </span>
       <input
         name={name}
@@ -53,13 +55,13 @@ export function AdminDateInput({
         dir="ltr"
         aria-describedby={ariaDescribedBy}
         aria-invalid={ariaInvalid}
-        aria-label={value ? `التاريخ: ${displayValue}` : "اختر التاريخ"}
+        aria-label={value ? `${t("التاريخ", "Date")}: ${displayValue}` : t("اختر التاريخ", "Choose date")}
       />
       {value && (
         <button
           type="button"
           className="absolute end-2 z-20 grid size-7 cursor-pointer place-items-center rounded-full text-base font-normal leading-none text-muted transition-colors hover:bg-surface-muted hover:text-brand-dark focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand"
-          aria-label="مسح التاريخ"
+          aria-label={t("مسح التاريخ", "Clear date")}
           onPointerDown={(event) => event.preventDefault()}
           onClick={(event) => {
             event.preventDefault();
@@ -82,6 +84,7 @@ export function AdminTimeInput({
   ariaDescribedBy,
   ariaInvalid,
 }: SharedInputProps) {
+  const { locale, t } = useAdminI18n();
   const [value, setValue] = useState(defaultValue.slice(0, 5));
 
   return (
@@ -98,7 +101,7 @@ export function AdminTimeInput({
         aria-invalid={ariaInvalid}
       />
       <span className="min-h-5 text-[11px] font-normal text-muted" aria-live="polite">
-        {value ? <bdi>{formatAdminTime(value)}</bdi> : "اختر الوقت"}
+        {value ? <bdi>{formatAdminTime(value, locale)}</bdi> : t("اختر الوقت", "Choose time")}
       </span>
     </span>
   );

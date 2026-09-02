@@ -1,5 +1,6 @@
 import { SectionHeading } from "@/components/home/section-heading";
 import { Container } from "@/components/ui/container";
+import { getLocale } from "@/lib/i18n";
 
 const values = [
   {
@@ -19,7 +20,9 @@ const values = [
   },
 ];
 
-export function WhyDentally() {
+export async function WhyDentally() {
+  const en = (await getLocale()) === "en";
+  const displayValues = en ? [{ number: "01", title: "Expertise", description: "Qualified dental professionals providing comprehensive care across dental specialties." }, { number: "02", title: "Safety", description: "Rigorous sterilization and patient-safety practices in a well-organized clinical environment." }, { number: "03", title: "Responsibility", description: "Patient-centered care, clear communication, and attention to individual needs." }] : values;
   return (
     <section id="about" className="px-page py-4 sm:py-8">
       <div className="mx-auto max-w-[90rem] overflow-hidden rounded-[2.5rem] bg-brand-dark text-white shadow-[0_30px_90px_rgb(11_82_66/0.18)]">
@@ -28,14 +31,14 @@ export function WhyDentally() {
           <div className="absolute -end-12 -top-20 size-72 rounded-full border border-white/10" aria-hidden="true" />
 
           <SectionHeading
-            eyebrow="لماذا دينتالي"
-            title="أكثر من مجرد عيادة أسنان."
-            description="قيم واضحة تقود تجربة الرعاية من لحظة الوصول وحتى اكتمال الزيارة."
+            eyebrow={en ? "Why Dentally" : "لماذا دينتالي"}
+            title={en ? "More than a dental clinic." : "أكثر من مجرد عيادة أسنان."}
+            description={en ? "Clear values guide your experience from arrival through the end of your visit." : "قيم واضحة تقود تجربة الرعاية من لحظة الوصول وحتى اكتمال الزيارة."}
             inverse
           />
 
           <div className="relative mt-14 grid border-t border-white/15 md:grid-cols-3">
-            {values.map((item, index) => (
+            {displayValues.map((item, index) => (
               <article
                 key={item.number}
                 className={`py-8 md:px-8 md:py-10 ${

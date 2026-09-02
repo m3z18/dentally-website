@@ -4,7 +4,8 @@ export const primaryNavigation: NavigationItem[] = [
   { label: "الرئيسية", href: "/" },
   { label: "الخدمات", href: "/services" },
   { label: "الأطباء", href: "/doctors" },
+  { label: "المركز التوعوي", href: "/articles" },
   { label: "عن دينتالي", href: "/#about" },
-  { label: "الأسئلة الشائعة", href: "/#faq" },
+  { label: "الأسئلة الشائعة", href: "/faq" },
   { label: "تواصل معنا", href: "/#contact" },
 ];

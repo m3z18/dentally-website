@@ -1,6 +1,6 @@
 import type { DentalService } from "@/types/service";
 
-export const dentalServices: DentalService[] = [
+const dentalServicesAr: DentalService[] = [
   {
     id: "implant",
     title: "زراعة الأسنان",
@@ -401,6 +401,28 @@ export const dentalServices: DentalService[] = [
     ],
   },
 ];
+
+const englishServices:Record<string,{title:string;description:string}>={
+  "dental-implants":{title:"Dental implants",description:"Assessment and treatment options for replacing missing teeth."},
+  orthodontics:{title:"Orthodontics",description:"Care focused on tooth alignment and bite relationships."},
+  "cosmetic-dentistry":{title:"Cosmetic dentistry",description:"Carefully considered options for improving the appearance of a smile."},
+  "pediatric-dentistry":{title:"Pediatric dentistry",description:"Dental care tailored to children in a reassuring environment."},
+  "teeth-whitening":{title:"Teeth whitening",description:"Whitening options selected after assessing tooth and gum health."},
+  "root-canal":{title:"Root canal treatment",description:"Assessment and treatment of tissues inside the tooth."},
+  "dental-fillings":{title:"Dental fillings",description:"Restorative care for teeth affected by decay or damage."},
+  prosthodontics:{title:"Prosthodontics",description:"Restorative options for damaged or missing teeth."},
+  periodontics:{title:"Periodontics",description:"Assessment and care for gum and supporting tissues."},
+  "oral-surgery":{title:"Oral surgery",description:"Surgical dental care planned after clinical assessment."},
+  "preventive-care":{title:"Preventive care",description:"Examinations, cleaning, and guidance that support oral health."},
+};
+
+export const dentalServices:DentalService[]=dentalServicesAr.map(service=>({
+  ...service,
+  titleEn:englishServices[service.slug]?.title,
+  descriptionEn:englishServices[service.slug]?.description,
+  introEn:englishServices[service.slug]?.description,
+  bookingEnabled:true,
+}));
 
 export function getServiceBySlug(slug: string) {
   return dentalServices.find((service) => service.slug === slug);

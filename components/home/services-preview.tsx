@@ -3,8 +3,10 @@ import Link from "next/link";
 import { SectionHeading } from "@/components/home/section-heading";
 import { Container } from "@/components/ui/container";
 import { dentalServices } from "@/data/services";
+import { getLocale } from "@/lib/i18n";
 
-export function ServicesPreview() {
+export async function ServicesPreview() {
+  const en = (await getLocale()) === "en";
   const featuredServices = dentalServices.filter((service) => service.featured);
   const additionalServices = dentalServices.filter((service) => !service.featured);
 
@@ -13,15 +15,15 @@ export function ServicesPreview() {
       <Container>
         <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
           <SectionHeading
-            eyebrow="خدمات دينتالي"
-            title="كل ما تحتاجه ابتسامتك، في مكان واحد."
-            description="مجموعة متكاملة من خدمات طب الأسنان، ضمن تجربة واضحة تبدأ بفهم احتياجك."
+            eyebrow={en ? "Dentally services" : "خدمات دينتالي"}
+            title={en ? "Everything your smile needs, in one place." : "كل ما تحتاجه ابتسامتك، في مكان واحد."}
+            description={en ? "Integrated dental services in a clear experience that starts by understanding your needs." : "مجموعة متكاملة من خدمات طب الأسنان، ضمن تجربة واضحة تبدأ بفهم احتياجك."}
           />
           <Link
             href="/services"
             className="inline-flex min-h-12 w-fit items-center justify-center rounded-full border border-brand/20 px-6 text-sm font-semibold text-brand-dark transition-colors hover:bg-brand-soft/60"
           >
-            عرض جميع الخدمات
+            {en ? "View all services" : "عرض جميع الخدمات"}
           </Link>
         </div>
 
@@ -37,9 +39,9 @@ export function ServicesPreview() {
               <span className="text-xs font-semibold text-brand/65">0{index + 1}</span>
               <div className="mt-16 max-w-md sm:mt-20">
                 <h3 className="text-2xl font-bold tracking-[-0.025em] text-foreground">
-                  {service.title}
+                  {en ? service.titleEn || service.title : service.title}
                 </h3>
-                <p className="mt-3 text-sm leading-7 text-muted">{service.description}</p>
+                <p className="mt-3 text-sm leading-7 text-muted">{en ? service.descriptionEn || service.description : service.description}</p>
               </div>
               <span className="absolute end-6 top-6 grid size-11 place-items-center rounded-full bg-brand-soft text-lg text-brand-dark transition-[background-color,color,transform] duration-300 group-hover:-translate-x-1 group-hover:bg-brand group-hover:text-white">
                 ←
@@ -56,7 +58,7 @@ export function ServicesPreview() {
               href={`/services/${service.slug}`}
               className="group flex min-h-20 items-center justify-between gap-4 rounded-2xl border border-line/90 bg-background px-5 py-4 text-sm font-semibold text-foreground transition-[border-color,background-color] hover:border-brand/20 hover:bg-brand-soft/35"
             >
-              {service.title}
+              {en ? service.titleEn || service.title : service.title}
               <span className="text-brand transition-transform group-hover:-translate-x-1" aria-hidden="true">
                 ←
               </span>

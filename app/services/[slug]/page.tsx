@@ -1,12 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import Image from "next/image";
+import { notFound, permanentRedirect } from "next/navigation";
 
 import { ServiceVisual } from "@/components/services/service-visual";
 import { Container } from "@/components/ui/container";
-import { dentalServices, getServiceBySlug } from "@/data/services";
+import { dentalServices } from "@/data/services";
+import { getPublicServiceBySlug } from "@/lib/catalog";
+import { getLocale } from "@/lib/i18n";
+import { getSlugRedirect } from "@/lib/seo";
 
-export const dynamicParams = false;
+export const dynamicParams = true;
 
 export function generateStaticParams() {
   return dentalServices.map((service) => ({ slug: service.slug }));
@@ -16,41 +20,47 @@ export async function generateMetadata({
   params,
 }: PageProps<"/services/[slug]">): Promise<Metadata> {
   const { slug } = await params;
-  const service = getServiceBySlug(slug);
+  const locale = await getLocale();
+  const service = await getPublicServiceBySlug(slug, locale);
+  const en = locale === "en";
 
   if (!service) {
-    return { title: "الخدمة غير موجودة" };
+    return { title: en ? "Service not found" : "الخدمة غير موجودة" };
   }
 
   return {
-    title: service.title,
-    description: service.description,
+    title: service.seoTitle || service.title,
+    description: service.seoDescription || service.description,
+    alternates: { canonical: `/services/${service.slug}` },
   };
 }
 
 export default async function ServiceDetailPage({ params }: PageProps<"/services/[slug]">) {
   const { slug } = await params;
-  const service = getServiceBySlug(slug);
+  const locale = await getLocale();
+  const service = await getPublicServiceBySlug(slug, locale);
 
-  if (!service) notFound();
+  if (!service) { const target=await getSlugRedirect("service",slug); if(target) permanentRedirect(`/services/${target}`); notFound(); }
 
-  const serviceIndex = dentalServices.findIndex((item) => item.id === service.id);
+  const serviceIndex = dentalServices.findIndex((item) => item.slug === service.slug);
+  const en = locale === "en";
+  const schema = { "@context":"https://schema.org", "@type":"Service", name:service.title, description:service.description, url:`/services/${service.slug}` };
 
   return (
     <>
       <section className="overflow-hidden border-b border-line bg-surface">
         <Container className="py-12 sm:py-16 lg:py-20">
-          <nav aria-label="مسار الصفحة" className="text-xs font-medium text-muted">
-            <Link href="/" className="transition-colors hover:text-brand">الرئيسية</Link>
+          <nav aria-label={en ? "Breadcrumb" : "مسار الصفحة"} className="text-xs font-medium text-muted">
+            <Link href="/" className="transition-colors hover:text-brand">{en ? "Home" : "الرئيسية"}</Link>
             <span className="mx-2" aria-hidden="true">/</span>
-            <Link href="/services" className="transition-colors hover:text-brand">الخدمات</Link>
+            <Link href="/services" className="transition-colors hover:text-brand">{en ? "Services" : "الخدمات"}</Link>
             <span className="mx-2" aria-hidden="true">/</span>
             <span className="text-foreground">{service.title}</span>
           </nav>
 
           <div className="mt-10 grid items-center gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16">
             <div>
-              <p className="text-sm font-bold text-brand">خدمات دينتالي</p>
+              <p className="text-sm font-bold text-brand">{en ? "Dentally services" : "خدمات دينتالي"}</p>
               <h1 className="mt-4 text-4xl font-bold leading-[1.2] tracking-[-0.045em] text-foreground sm:text-5xl lg:text-6xl">
                 {service.title}
               </h1>
@@ -59,31 +69,31 @@ export default async function ServiceDetailPage({ params }: PageProps<"/services
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link
-                  href={`/booking?service=${service.slug}`}
+                  href={service.bookingEnabled ? `/booking?service=${service.slug}` : "/booking"}
                   className="inline-flex min-h-13 items-center justify-center rounded-full bg-brand px-7 text-sm font-bold text-white shadow-[0_12px_30px_rgb(20_112_91/0.2)] transition-[background-color,transform] hover:-translate-y-0.5 hover:bg-brand-dark"
                 >
-                  احجز موعدًا لهذه الخدمة
+                  {en ? "Book this service" : "احجز موعدًا لهذه الخدمة"}
                 </Link>
                 <Link
                   href="/services"
                   className="inline-flex min-h-13 items-center justify-center rounded-full border border-line px-7 text-sm font-bold text-foreground transition-colors hover:border-brand/25 hover:bg-brand-soft/40"
                 >
-                  جميع الخدمات
+                  {en ? "All services" : "جميع الخدمات"}
                 </Link>
               </div>
             </div>
-            <ServiceVisual index={serviceIndex} />
+            {service.imageUrl?<div className="relative aspect-[4/3] overflow-hidden rounded-card bg-brand-soft"><Image src={service.imageUrl} alt={service.imageAlt||service.title} fill priority sizes="(min-width:1024px) 40vw, 100vw" className="object-cover"/></div>:<ServiceVisual index={serviceIndex} />}
           </div>
         </Container>
       </section>
 
-      <section className="py-section">
+      {(service.procedures.length>0||service.needIndicators.length>0)&&<section className="py-section">
         <Container>
           <div className="grid gap-6 lg:grid-cols-2">
             <div className="rounded-card border border-line bg-surface p-7 sm:p-9">
-              <p className="text-xs font-bold tracking-[0.14em] text-brand">ضمن هذه الخدمة</p>
+              <p className="text-xs font-bold tracking-[0.14em] text-brand">{en ? "Included" : "ضمن هذه الخدمة"}</p>
               <h2 className="mt-3 text-2xl font-bold tracking-[-0.03em] text-foreground sm:text-3xl">
-                الإجراءات والخدمات الفرعية
+                {en ? "Procedures and related care" : "الإجراءات والخدمات الفرعية"}
               </h2>
               <ul className="mt-7 grid gap-3">
                 {service.procedures.map((procedure) => (
@@ -96,9 +106,9 @@ export default async function ServiceDetailPage({ params }: PageProps<"/services
             </div>
 
             <div className="rounded-card bg-brand p-7 text-white sm:p-9">
-              <p className="text-xs font-bold tracking-[0.14em] text-white/65">مؤشرات عامة</p>
+              <p className="text-xs font-bold tracking-[0.14em] text-white/65">{en ? "General indicators" : "مؤشرات عامة"}</p>
               <h2 className="mt-3 text-2xl font-bold tracking-[-0.03em] sm:text-3xl">
-                متى قد تحتاج هذه الخدمة؟
+                {en ? "When might you need this service?" : "متى قد تحتاج هذه الخدمة؟"}
               </h2>
               <ul className="mt-7 grid gap-5">
                 {service.needIndicators.map((indicator, index) => (
@@ -111,23 +121,23 @@ export default async function ServiceDetailPage({ params }: PageProps<"/services
                 ))}
               </ul>
               <p className="mt-8 border-t border-white/15 pt-5 text-xs leading-6 text-white/60">
-                هذه مؤشرات عامة وليست تشخيصًا. يحدد الطبيب الحاجة العلاجية بعد الفحص.
+                {en ? "These are general indicators, not a diagnosis. Treatment needs are determined after examination." : "هذه مؤشرات عامة وليست تشخيصًا. يحدد الطبيب الحاجة العلاجية بعد الفحص."}
               </p>
             </div>
           </div>
         </Container>
-      </section>
+      </section>}
 
-      <section className="bg-surface py-section">
+      {service.visitExpectations.length>0&&<section className="bg-surface py-section">
         <Container>
           <div className="grid gap-10 lg:grid-cols-[0.78fr_1.22fr] lg:gap-20">
             <div>
-              <p className="text-sm font-bold text-brand">زيارة واضحة</p>
+              <p className="text-sm font-bold text-brand">{en ? "A clear visit" : "زيارة واضحة"}</p>
               <h2 className="mt-4 text-3xl font-bold leading-[1.3] tracking-[-0.04em] text-foreground sm:text-4xl">
-                ماذا تتوقع أثناء الزيارة؟
+                {en ? "What to expect during your visit" : "ماذا تتوقع أثناء الزيارة؟"}
               </h2>
               <p className="mt-5 text-sm leading-7 text-muted">
-                نبدأ بفهم احتياجك، ثم نناقش الخطوات المناسبة بناءً على التقييم السريري.
+                {en ? "We begin by understanding your needs, then discuss appropriate steps based on the clinical assessment." : "نبدأ بفهم احتياجك، ثم نناقش الخطوات المناسبة بناءً على التقييم السريري."}
               </p>
             </div>
             <ol className="grid gap-4">
@@ -142,14 +152,14 @@ export default async function ServiceDetailPage({ params }: PageProps<"/services
             </ol>
           </div>
         </Container>
-      </section>
+      </section>}
 
-      <section className="py-section">
+      {service.faq.length>0&&<section className="py-section">
         <Container className="max-w-4xl">
           <div className="text-center">
-            <p className="text-sm font-bold text-brand">أسئلة شائعة</p>
+            <p className="text-sm font-bold text-brand">{en ? "FAQ" : "أسئلة شائعة"}</p>
             <h2 className="mt-4 text-3xl font-bold tracking-[-0.04em] text-foreground sm:text-4xl">
-              معلومات أولية قبل زيارتك
+              {en ? "Helpful information before your visit" : "معلومات أولية قبل زيارتك"}
             </h2>
           </div>
           <div className="mt-9 grid gap-3">
@@ -166,25 +176,26 @@ export default async function ServiceDetailPage({ params }: PageProps<"/services
             ))}
           </div>
         </Container>
-      </section>
+      </section>}
 
       <section className="pb-section">
         <Container>
           <div className="relative overflow-hidden rounded-[2.5rem] bg-brand px-7 py-10 text-white sm:px-10 sm:py-12 lg:flex lg:items-center lg:justify-between lg:gap-12 lg:px-14">
             <span className="absolute -bottom-24 -start-14 size-64 rounded-full border-[30px] border-white/5" aria-hidden="true" />
             <div className="relative max-w-2xl">
-              <h2 className="text-3xl font-bold tracking-[-0.04em] sm:text-4xl">هل ترغب في مناقشة هذه الخدمة؟</h2>
-              <p className="mt-4 text-sm leading-7 text-white/75">ابدأ بطلب موعد، وسيتم ربط الحجز بالخدمة التي اخترتها.</p>
+              <h2 className="text-3xl font-bold tracking-[-0.04em] sm:text-4xl">{en ? "Would you like to discuss this service?" : "هل ترغب في مناقشة هذه الخدمة؟"}</h2>
+              <p className="mt-4 text-sm leading-7 text-white/75">{en ? "Start an appointment request with this service preselected." : "ابدأ بطلب موعد، وسيتم ربط الحجز بالخدمة التي اخترتها."}</p>
             </div>
             <Link
-              href={`/booking?service=${service.slug}`}
+              href={service.bookingEnabled ? `/booking?service=${service.slug}` : "/booking"}
               className="relative mt-7 inline-flex min-h-13 w-full items-center justify-center rounded-full bg-white px-7 text-sm font-bold text-brand-dark transition-transform hover:-translate-y-0.5 lg:mt-0 lg:w-auto"
             >
-              احجز موعدًا لهذه الخدمة
+              {en ? "Book this service" : "احجز موعدًا لهذه الخدمة"}
             </Link>
           </div>
         </Container>
       </section>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify(schema).replace(/</g,"\\u003c")}} />
     </>
   );
 }

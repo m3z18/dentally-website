@@ -6,6 +6,7 @@ import { AdminPageHeader } from "@/components/admin/page-header";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { requireAdmin } from "@/lib/auth/admin";
 import { getRiyadhDateValue } from "@/lib/date";
+import { getLocale } from "@/lib/i18n";
 import { createClient } from "@/lib/supabase/server";
 import { isDateValue } from "@/lib/validation/admin";
 import { appointmentStatusLabels, type AppointmentWithService } from "@/types/admin";
@@ -21,8 +22,8 @@ type AppointmentsPageProps = {
 };
 
 export default async function AdminAppointmentsPage({ searchParams }: AppointmentsPageProps) {
-  await requireAdmin();
-  const filters = await searchParams;
+  const [, filters, locale] = await Promise.all([requireAdmin(), searchParams, getLocale()]);
+  const t = (arabic: string, english: string) => locale === "ar" ? arabic : english;
   const today = getRiyadhDateValue();
   const scope = ["today", "upcoming", "all"].includes(filters.scope ?? "") ? filters.scope! : "upcoming";
   const status = Object.hasOwn(appointmentStatusLabels, filters.status ?? "")
@@ -63,62 +64,62 @@ export default async function AdminAppointmentsPage({ searchParams }: Appointmen
       <AdminPageHeader eyebrow="إدارة الحجوزات" title="المواعيد" description="اعرض المواعيد القادمة، وابحث وفلتر دون كشف البيانات خارج لوحة الإدارة." />
       <form className="mt-8 grid gap-3 rounded-card border border-line bg-surface p-5 sm:grid-cols-2 xl:grid-cols-5" method="get">
         <label className="grid gap-1.5 text-xs font-bold text-muted">
-          العرض
+          {t("العرض", "View")}
           <select name="scope" defaultValue={scope} className="min-h-11 rounded-xl border border-line bg-background px-3 text-sm font-normal text-foreground outline-none focus:border-brand">
-            <option value="today">مواعيد اليوم</option>
-            <option value="upcoming">المواعيد القادمة</option>
-            <option value="all">جميع المواعيد</option>
+            <option value="today">{t("مواعيد اليوم", "Today's appointments")}</option>
+            <option value="upcoming">{t("المواعيد القادمة", "Upcoming appointments")}</option>
+            <option value="all">{t("جميع المواعيد", "All appointments")}</option>
           </select>
         </label>
         <label className="grid gap-1.5 text-xs font-bold text-muted">
-          التاريخ
+          {t("التاريخ", "Date")}
           <AdminDateInput name="date" defaultValue={exactDate} className="min-h-11 rounded-xl border border-line bg-background px-3 text-sm font-normal text-foreground outline-none focus:border-brand" />
         </label>
         <label className="grid gap-1.5 text-xs font-bold text-muted">
-          الحالة
+          {t("الحالة", "Status")}
           <select name="status" defaultValue={status} className="min-h-11 rounded-xl border border-line bg-background px-3 text-sm font-normal text-foreground outline-none focus:border-brand">
-            <option value="">جميع الحالات</option>
-            {Object.entries(appointmentStatusLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+            <option value="">{t("جميع الحالات", "All statuses")}</option>
+            {Object.entries(appointmentStatusLabels).map(([value, label]) => <option key={value} value={value}>{locale === "ar" ? label : ({ pending: "Pending", confirmed: "Confirmed", cancelled: "Cancelled", completed: "Completed", no_show: "No-show" }[value] ?? label)}</option>)}
           </select>
         </label>
         <label className="grid gap-1.5 text-xs font-bold text-muted xl:col-span-2">
-          البحث
+          {t("البحث", "Search")}
           <span className="grid gap-2 sm:grid-cols-[1fr_auto]">
-            <input name="q" type="search" defaultValue={queryText} maxLength={80} placeholder="الاسم، الجوال، أو رقم الحجز" className="min-h-11 min-w-0 rounded-xl border border-line bg-background px-3 text-sm font-normal text-foreground outline-none focus:border-brand" />
-            <button type="submit" className="min-h-11 cursor-pointer rounded-xl bg-brand px-5 text-xs font-bold text-white hover:bg-brand-dark">تطبيق</button>
+            <input name="q" type="search" defaultValue={queryText} maxLength={80} placeholder={t("الاسم، الجوال، أو رقم الحجز", "Name, mobile, or booking reference")} className="min-h-11 min-w-0 rounded-xl border border-line bg-background px-3 text-sm font-normal text-foreground outline-none focus:border-brand" />
+            <button type="submit" className="min-h-11 cursor-pointer rounded-xl bg-brand px-5 text-xs font-bold text-white hover:bg-brand-dark">{t("تطبيق", "Apply")}</button>
           </span>
         </label>
       </form>
 
       <div className="mt-5 flex flex-wrap items-center justify-between gap-3 text-xs text-muted">
-        <p>{error ? "تعذر حساب النتائج" : `${appointments.length} موعد`}</p>
-        {hasFilters && <Link href="/admin/appointments" className="font-bold text-brand hover:text-brand-dark">مسح الفلاتر</Link>}
+        <p>{error ? t("تعذر حساب النتائج", "Could not count results") : t(`${appointments.length} موعد`, `${appointments.length} appointments`)}</p>
+        {hasFilters && <Link href="/admin/appointments" className="font-bold text-brand hover:text-brand-dark">{t("مسح الفلاتر", "Clear filters")}</Link>}
       </div>
 
       {error ? (
-        <p className="mt-4 rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-800" role="alert">تعذر تحميل المواعيد الآن. حاول مرة أخرى.</p>
+        <p className="mt-4 rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-800" role="alert">{t("تعذر تحميل المواعيد الآن. حاول مرة أخرى.", "Appointments could not be loaded. Please try again.")}</p>
       ) : appointments.length > 0 ? (
         <div className="mt-4 grid gap-3">
           {appointments.map((appointment) => (
             <Link key={appointment.id} href={`/admin/appointments/${appointment.id}`} className="grid gap-4 rounded-3xl border border-line bg-surface p-5 transition-colors hover:border-brand/30 sm:grid-cols-[1fr_auto] sm:items-center">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-3">
-                  <h2 className="text-sm font-bold text-foreground">{appointment.patient_name}</h2>
-                  <span className="text-xs font-bold text-brand" dir="ltr">{appointment.booking_reference}</span>
+                  <h2 className="text-sm font-bold text-foreground" data-admin-content>{appointment.patient_name}</h2>
+                  <span className="text-xs font-bold text-brand" dir="ltr" data-admin-content>{appointment.booking_reference}</span>
                 </div>
                 <p className="mt-2 flex flex-wrap items-center gap-x-1.5 text-xs leading-6 text-muted">
-                  <span>{appointment.services?.name_ar}</span>
+                  <span data-admin-content>{appointment.services?.name_ar}</span>
                   <span aria-hidden="true">—</span>
                   <AdminDateTime date={appointment.appointment_date} time={appointment.appointment_time} includeWeekday />
                 </p>
-                <p className="mt-1 text-xs text-muted" dir="ltr">{appointment.patient_phone}</p>
+                <p className="mt-1 text-xs text-muted" dir="ltr" data-admin-content>{appointment.patient_phone}</p>
               </div>
               <StatusBadge status={appointment.status} />
             </Link>
           ))}
         </div>
       ) : (
-        <p className="mt-6 rounded-3xl border border-dashed border-line bg-surface px-5 py-12 text-center text-sm text-muted">لا توجد مواعيد مطابقة للفلاتر الحالية.</p>
+        <p className="mt-6 rounded-3xl border border-dashed border-line bg-surface px-5 py-12 text-center text-sm text-muted">{t("لا توجد مواعيد مطابقة للفلاتر الحالية.", "No appointments match the current filters.")}</p>
       )}
     </>
   );

@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 
+import { useAdminI18n } from "@/components/admin/admin-i18n";
 import { AdminDate, AdminTime } from "@/components/admin/date-time-display";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { addDaysToDate } from "@/lib/date";
@@ -14,6 +17,7 @@ export function WeeklyCalendar({
   weekStart: string;
   today: string;
 }) {
+  const { t } = useAdminI18n();
   const days = Array.from({ length: 7 }, (_, index) => addDaysToDate(weekStart, index));
 
   return (
@@ -27,7 +31,7 @@ export function WeeklyCalendar({
               <h3 className="text-xs font-bold leading-5 text-foreground">
                 <AdminDate value={date} includeWeekday />
               </h3>
-              <span className="shrink-0 rounded-full bg-surface-muted px-2 py-1 text-[10px] font-bold text-muted" aria-label={`${dayAppointments.length} مواعيد`}>
+              <span className="shrink-0 rounded-full bg-surface-muted px-2 py-1 text-[10px] font-bold text-muted" aria-label={t(`${dayAppointments.length} مواعيد`, `${dayAppointments.length} appointments`)}>
                 {dayAppointments.length}
               </span>
             </div>
@@ -38,9 +42,9 @@ export function WeeklyCalendar({
                     <AdminTime value={appointment.appointment_time} className="font-bold" />
                     <StatusBadge status={appointment.status} />
                   </span>
-                  <span className="mt-1 block truncate font-semibold">{appointment.patient_name}</span>
+                  <span className="mt-1 block truncate font-semibold" data-admin-content>{appointment.patient_name}</span>
                 </Link>
-              )) : <p className="text-[11px] text-muted/70">لا توجد مواعيد</p>}
+              )) : <p className="text-[11px] text-muted/70">{t("لا توجد مواعيد", "No appointments")}</p>}
             </div>
           </section>
         );

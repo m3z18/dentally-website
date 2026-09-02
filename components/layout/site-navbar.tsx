@@ -5,22 +5,26 @@ import Link from "next/link";
 
 import { Container } from "@/components/ui/container";
 import { SiteLogo } from "@/components/ui/site-logo";
-import { primaryNavigation } from "@/data/navigation";
+import { AppearanceControls } from "@/components/layout/appearance-controls";
+import type { Locale } from "@/lib/locale";
+import { publicNavigation, ui } from "@/lib/locale";
 
 const bookingCtaClasses =
   "min-h-11 items-center justify-center rounded-full bg-brand px-5 text-sm font-semibold text-white shadow-[0_10px_24px_rgb(20_112_91/0.18)] transition-colors hover:bg-brand-dark";
 
-export function SiteNavbar() {
+export function SiteNavbar({ locale }: { locale: Locale }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const t = ui[locale];
+  const primaryNavigation = publicNavigation(locale);
 
   return (
     <header className="sticky top-0 z-50 border-b border-line/80 bg-background/90 backdrop-blur-xl">
       <Container>
         <nav
           className="flex min-h-20 items-center justify-between gap-6"
-          aria-label="التنقل الرئيسي"
+          aria-label={t.nav}
         >
-          <SiteLogo size="sm" />
+          <SiteLogo size="sm" locale={locale} priority />
 
           <div className="hidden items-center gap-1 lg:flex">
             {primaryNavigation.map((item) => (
@@ -34,9 +38,10 @@ export function SiteNavbar() {
             ))}
           </div>
 
-          <div className="hidden lg:block">
+          <div className="hidden items-center gap-2 lg:flex">
+            <AppearanceControls locale={locale} />
             <Link href="/booking" className={`${bookingCtaClasses} inline-flex`}>
-              احجز موعدك
+              {t.booking}
             </Link>
           </div>
 
@@ -44,7 +49,7 @@ export function SiteNavbar() {
             <button
               type="button"
               className="group grid size-11 cursor-pointer place-items-center rounded-full border border-line bg-surface text-brand-dark transition-colors hover:border-brand/30 hover:bg-brand-soft/50"
-              aria-label={isMenuOpen ? "إغلاق قائمة التنقل" : "فتح قائمة التنقل"}
+              aria-label={isMenuOpen ? t.closeMenu : t.openMenu}
               aria-expanded={isMenuOpen}
               aria-controls="mobile-navigation"
               onClick={() => setIsMenuOpen((current) => !current)}
@@ -90,8 +95,9 @@ export function SiteNavbar() {
                 className={`${bookingCtaClasses} mt-3 inline-flex w-full`}
                 onClick={() => setIsMenuOpen(false)}
               >
-                احجز موعدك
+                {t.booking}
               </Link>
+              <div className="mt-3 border-t border-line pt-3"><AppearanceControls locale={locale} /></div>
             </div>
           </div>
         </nav>

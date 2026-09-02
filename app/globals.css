@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 @font-face {
   font-family: "Alexandria";
@@ -30,6 +31,90 @@
   --brand-dark: #0b5242;
   --brand-soft: #dcece6;
   --font-alexandria: "Alexandria";
+}
+
+.dark {
+  color-scheme: dark;
+  --background: #0b0b0c;
+  --surface: #151517;
+  --surface-muted: #212124;
+  --foreground: #f4f4f5;
+  --muted: #a1a1aa;
+  --line: #36363b;
+  --brand: #3db696;
+  --brand-dark: #72d2b9;
+  --brand-soft: #123b31;
+}
+
+.dark .bg-red-50 {
+  background-color: rgb(69 10 10 / 0.55);
+}
+
+.dark .bg-amber-50,
+.dark .bg-yellow-50 {
+  background-color: rgb(69 43 8 / 0.55);
+}
+
+.dark .bg-emerald-50,
+.dark .bg-green-50 {
+  background-color: rgb(6 78 59 / 0.45);
+}
+
+.dark .bg-blue-50 {
+  background-color: rgb(23 37 84 / 0.55);
+}
+
+.dark .bg-slate-100 {
+  background-color: #27272a;
+}
+
+.dark :where(.text-red-700, .text-red-800, .text-red-900) {
+  color: #fca5a5;
+}
+
+.dark :where(.text-amber-800, .text-amber-900, .text-amber-950) {
+  color: #fcd34d;
+}
+
+.dark .text-emerald-800 {
+  color: #6ee7b7;
+}
+
+.dark .text-blue-800 {
+  color: #93c5fd;
+}
+
+.dark .text-slate-700 {
+  color: #d4d4d8;
+}
+
+.dark :where(.border-red-200, .border-red-300) {
+  border-color: #7f1d1d;
+}
+
+.dark .border-amber-200 {
+  border-color: #78350f;
+}
+
+html[data-theme-transition] :where(
+  body,
+  header,
+  footer,
+  main,
+  aside,
+  nav,
+  section,
+  article,
+  dialog,
+  button,
+  a,
+  input,
+  textarea,
+  select
+) {
+  transition-duration: 180ms;
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: ease-out;
 }
 
 @theme inline {
@@ -144,6 +229,10 @@ a {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html[data-theme-transition] * {
+    transition-duration: 0.01ms !important;
+  }
+
   html {
     scroll-behavior: auto;
   }
@@ -156,4 +245,9 @@ a {
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+@media print {
+  header, footer, .print\:hidden { display: none !important; }
+  body { background: white !important; color: black !important; }
 }
