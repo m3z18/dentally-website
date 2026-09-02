@@ -2,13 +2,16 @@ import Link from "next/link";
 
 import { SectionHeading } from "@/components/home/section-heading";
 import { Container } from "@/components/ui/container";
-import { dentalServices } from "@/data/services";
+import { getPublicServices } from "@/lib/catalog";
 import { getLocale } from "@/lib/i18n";
 
 export async function ServicesPreview() {
-  const en = (await getLocale()) === "en";
-  const featuredServices = dentalServices.filter((service) => service.featured);
-  const additionalServices = dentalServices.filter((service) => !service.featured);
+  const locale = await getLocale();
+  const en = locale === "en";
+  const services = (await getPublicServices(locale)).slice(0, 6);
+  if (!services.length) return null;
+  const featuredServices = services.slice(0, 3);
+  const additionalServices = services.slice(3);
 
   return (
     <section id="services" className="py-section">
@@ -38,10 +41,9 @@ export async function ServicesPreview() {
             >
               <span className="text-xs font-semibold text-brand/65">0{index + 1}</span>
               <div className="mt-16 max-w-md sm:mt-20">
-                <h3 className="text-2xl font-bold tracking-[-0.025em] text-foreground">
-                  {en ? service.titleEn || service.title : service.title}
-                </h3>
-                <p className="mt-3 text-sm leading-7 text-muted">{en ? service.descriptionEn || service.description : service.description}</p>
+                {service.specialty && <p className="mb-2 text-xs font-bold text-brand">{service.specialty.label}</p>}
+                <h3 className="text-2xl font-bold tracking-[-0.025em] text-foreground">{service.title}</h3>
+                {service.description && <p className="mt-3 text-sm leading-7 text-muted">{service.description}</p>}
               </div>
               <span className="absolute end-6 top-6 grid size-11 place-items-center rounded-full bg-brand-soft text-lg text-brand-dark transition-[background-color,color,transform] duration-300 group-hover:-translate-x-1 group-hover:bg-brand group-hover:text-white">
                 ←
@@ -58,7 +60,7 @@ export async function ServicesPreview() {
               href={`/services/${service.slug}`}
               className="group flex min-h-20 items-center justify-between gap-4 rounded-2xl border border-line/90 bg-background px-5 py-4 text-sm font-semibold text-foreground transition-[border-color,background-color] hover:border-brand/20 hover:bg-brand-soft/35"
             >
-              {en ? service.titleEn || service.title : service.title}
+              <span>{service.title}{service.specialty && <span className="mt-1 block text-xs font-medium text-muted">{service.specialty.label}</span>}</span>
               <span className="text-brand transition-transform group-hover:-translate-x-1" aria-hidden="true">
                 ←
               </span>

@@ -31,6 +31,10 @@ function toDentalService(row: ServiceContentRow, locale: "ar" | "en"): DentalSer
     faq: locale==="en" ? [] : fallback?.faq ?? emptyDetails.faq,
     bookingEnabled:Boolean(fallback),imageUrl:getServiceImagePublicUrl(row.image_path),imageAlt:localized(row.image_alt_ar,row.image_alt_en,locale)||null,
     seoTitle:localized(row.seo_title_ar,row.seo_title_en,locale)||null,seoDescription:localized(row.seo_description_ar,row.seo_description_en,locale)||null,
+    specialty: row.specialties ? {
+      slug: row.specialties.slug,
+      label: localized(row.specialties.name_ar, row.specialties.name_en, locale),
+    } : null,
   };
 }
 
@@ -39,16 +43,16 @@ function localizeStatic(service:DentalService,locale:"ar"|"en"):DentalService{re
 export const getPublicServices = cache(async (locale: "ar" | "en"): Promise<DentalService[]> => {
   if (!hasSupabasePublicEnv()) return dentalServices.map(service=>localizeStatic(service,locale));
   const supabase = await createClient();
-  const { data, error } = await supabase.from("services").select("*").eq("is_public", true).is("deleted_at", null).order("display_order").order("name_ar");
-  if (error) return dentalServices.map(service=>localizeStatic(service,locale));
-  return (data as ServiceContentRow[]).map((row) => toDentalService(row, locale));
+  const { data, error } = await supabase.from("services").select("*, specialties(slug,name_ar,name_en)").eq("is_public", true).is("deleted_at", null).order("display_order").order("name_ar");
+  if (error) return [];
+  return (data as unknown as ServiceContentRow[]).map((row) => toDentalService(row, locale));
 });
 
 export const getPublicServiceBySlug = cache(async (slug: string, locale: "ar" | "en") => {
   if (!hasSupabasePublicEnv()) {const fallback=getServiceBySlug(slug);return fallback?localizeStatic(fallback,locale):null;}
   const supabase = await createClient();
-  const { data, error } = await supabase.from("services").select("*").eq("slug", slug).eq("is_public", true).is("deleted_at", null).maybeSingle();
-  if(error){const fallback=getServiceBySlug(slug);return fallback?localizeStatic(fallback,locale):null;}if(!data)return null;return toDentalService(data as ServiceContentRow, locale);
+  const { data, error } = await supabase.from("services").select("*, specialties(slug,name_ar,name_en)").eq("slug", slug).eq("is_public", true).is("deleted_at", null).maybeSingle();
+  if(error||!data)return null;return toDentalService(data as unknown as ServiceContentRow, locale);
 });
 
 export const getPublicBranches = cache(async (): Promise<BranchRow[]> => {
@@ -64,10 +68,11 @@ export async function searchPublishedContent(query: string, locale: "ar" | "en")
   const supabase = await createClient();
   const safe = term.replace(/[%_,()]/g, " ").replace(/\s+/g, " ").trim();
   if (safe.length < 2) return [];
+  const now = new Date().toISOString();
   const [services, doctors, articles] = await Promise.all([
     supabase.from("services").select("slug,name_ar,name_en,description_ar,description_en").eq("is_public", true).is("deleted_at", null).or(`name_ar.ilike.%${safe}%,name_en.ilike.%${safe}%,description_ar.ilike.%${safe}%,description_en.ilike.%${safe}%`).limit(8),
     supabase.from("doctors").select("slug,name_ar,name_en,short_bio_ar,short_bio_en").eq("is_active", true).is("deleted_at", null).or(`name_ar.ilike.%${safe}%,name_en.ilike.%${safe}%,specialty_ar.ilike.%${safe}%,specialty_en.ilike.%${safe}%`).limit(8),
-    supabase.from("articles").select("slug,title_ar,title_en,excerpt_ar,excerpt_en").eq("is_active", true).is("deleted_at", null).lte("published_at", new Date().toISOString()).or(`title_ar.ilike.%${safe}%,title_en.ilike.%${safe}%,excerpt_ar.ilike.%${safe}%,excerpt_en.ilike.%${safe}%`).limit(8),
+    supabase.from("articles").select("slug,title_ar,title_en,excerpt_ar,excerpt_en").eq("is_active", true).is("deleted_at", null).lte("published_at", now).or(`scheduled_publish_at.is.null,scheduled_publish_at.lte.${now}`).or(`scheduled_unpublish_at.is.null,scheduled_unpublish_at.gt.${now}`).or(`title_ar.ilike.%${safe}%,title_en.ilike.%${safe}%,excerpt_ar.ilike.%${safe}%,excerpt_en.ilike.%${safe}%`).limit(8),
   ]);
   const results: SearchResult[] = [];
   for (const row of services.data ?? []) results.push({ type: "service", title: localized(row.name_ar,row.name_en,locale), description: localized(row.description_ar,row.description_en,locale), href: `/services/${row.slug}` });

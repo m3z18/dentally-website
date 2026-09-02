@@ -5,11 +5,18 @@ import { getLocale } from "@/lib/i18n";
 import { getSiteSettings } from "@/lib/site-content";
 
 export async function ContactPreview() {
-  const [locale, settings] = await Promise.all([getLocale(), getSiteSettings()]); const en = locale === "en";
-  const phone = settings?.phone || contactDetails.phone; const email = settings?.email || contactDetails.email; const location = en ? settings?.address_en || settings?.address_ar || contactDetails.location : settings?.address_ar || contactDetails.location;
-  const items = en ? [
-    { label: "Location", value: location }, { label: "Phone", value: phone, href: `tel:${phone}` }, { label: "Email", value: email, href: `mailto:${email}` },
-  ] : [{ label: "الموقع", value: location }, { label: "الهاتف", value: phone, href: `tel:${phone}` }, { label: "البريد الإلكتروني", value: email, href: `mailto:${email}` }];
+  const [locale, settings] = await Promise.all([getLocale(), getSiteSettings()]);
+  const en = locale === "en";
+  const phone = settings?.phone || contactDetails.phone;
+  const email = settings?.email || contactDetails.email;
+  const location = en ? settings?.address_en || settings?.address_ar || contactDetails.location : settings?.address_ar || contactDetails.location;
+  const hours = en ? settings?.working_hours_en || settings?.working_hours_ar : settings?.working_hours_ar;
+  const items = [
+    { label: en ? "Location" : "الموقع", value: location },
+    { label: en ? "Phone" : "الهاتف", value: phone, href: `tel:${phone}` },
+    { label: en ? "Email" : "البريد الإلكتروني", value: email, href: `mailto:${email}` },
+    ...(hours ? [{ label: en ? "Working hours" : "ساعات العمل", value: hours }] : []),
+  ];
   return (
     <section id="contact" className="py-section">
       <Container>
@@ -20,9 +27,8 @@ export async function ContactPreview() {
               title={en ? "Closer to your smile." : "نحن أقرب إلى ابتسامتك."}
               description={en ? "Contact the Dentally team using the approved contact details." : "تواصل مع فريق Dentally عبر بيانات التواصل المعتمدة."}
             />
-            <div className="mt-8 rounded-2xl border border-dashed border-line bg-surface-muted/60 px-5 py-4 text-sm leading-7 text-muted">
-              {en ? "Working hours and the detailed address will appear after approval." : "ساعات العمل والعنوان التفصيلي سيُضافان بعد اعتمادهما."}
-            </div>
+            <a href="/contact" className="mt-8 inline-flex min-h-11 items-center rounded-full border border-brand/20 px-5 text-sm font-bold text-brand-dark transition-colors hover:bg-brand-soft/60">{en ? "All contact details" : "جميع بيانات التواصل"}</a>
+            {settings?.maps_url && <a href={settings.maps_url} target="_blank" rel="noopener noreferrer" className="mt-3 ms-3 inline-flex min-h-11 items-center rounded-full bg-brand px-5 text-sm font-bold text-white transition-colors hover:bg-brand-dark">{en ? "Open map" : "فتح الخريطة"}</a>}
           </div>
 
           <dl className="grid gap-px overflow-hidden rounded-card border border-line bg-line sm:grid-cols-2">

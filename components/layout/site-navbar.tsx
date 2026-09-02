@@ -26,7 +26,7 @@ export function SiteNavbar({ locale }: { locale: Locale }) {
         >
           <SiteLogo size="sm" locale={locale} priority />
 
-          <div className="hidden items-center gap-1 lg:flex">
+          <div className="hidden items-center gap-1 xl:flex">
             {primaryNavigation.map((item) => (
               <Link
                 key={item.label}
@@ -38,14 +38,14 @@ export function SiteNavbar({ locale }: { locale: Locale }) {
             ))}
           </div>
 
-          <div className="hidden items-center gap-2 lg:flex">
+          <div className="hidden items-center gap-2 xl:flex">
             <AppearanceControls locale={locale} />
             <Link href="/booking" className={`${bookingCtaClasses} inline-flex`}>
               {t.booking}
             </Link>
           </div>
 
-          <div className="relative lg:hidden">
+          <div className="relative xl:hidden">
             <button
               type="button"
               className="group grid size-11 cursor-pointer place-items-center rounded-full border border-line bg-surface text-brand-dark transition-colors hover:border-brand/30 hover:bg-brand-soft/50"

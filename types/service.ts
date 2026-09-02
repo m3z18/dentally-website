@@ -17,6 +17,10 @@ export type DentalService = {
   imageAlt?: string | null;
   seoTitle?: string | null;
   seoDescription?: string | null;
+  specialty?: {
+    slug: string;
+    label: string;
+  } | null;
 };
 
 export type ServiceFaq = {

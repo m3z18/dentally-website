@@ -25,6 +25,7 @@ export type ServiceContentRow = {
   seo_description_ar: string | null; seo_description_en: string | null;
   is_active: boolean; is_public: boolean; deleted_at: string | null;
   created_at: string; updated_at: string;
+  specialties?: Pick<SpecialtyRow, "slug" | "name_ar" | "name_en"> | null;
 };
 
 export type SearchResult = {

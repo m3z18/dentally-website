@@ -6,7 +6,7 @@ import { contactDetails } from "@/data/contact";
 import type { Locale } from "@/lib/locale";
 import { publicNavigation, ui } from "@/lib/locale";
 
-export function SiteFooter({ locale, contact }: { locale: Locale; contact: { phone: string | null; email: string | null; addressAr: string | null; addressEn: string | null } }) {
+export function SiteFooter({ locale, organizationName, contact }: { locale: Locale; organizationName: string; contact: { phone: string | null; email: string | null; addressAr: string | null; addressEn: string | null } }) {
   const t = ui[locale];
   const primaryNavigation = publicNavigation(locale);
   const phone = contact.phone || contactDetails.phone;
@@ -17,10 +17,17 @@ export function SiteFooter({ locale, contact }: { locale: Locale; contact: { pho
     { label: t.email, value: email, href: `mailto:${email}` },
     { label: t.location, value: location },
   ];
+  const secondaryNavigation = [
+    { label: locale === "en" ? "FAQ" : "الأسئلة الشائعة", href: "/faq" },
+    { label: locale === "en" ? "Insurance" : "التأمين", href: "/insurance" },
+    { label: locale === "en" ? "Offers" : "العروض", href: "/offers" },
+    { label: locale === "en" ? "Gallery" : "المعرض", href: "/gallery" },
+    { label: locale === "en" ? "Branches" : "الفروع", href: "/branches" },
+  ];
   return (
     <footer className="border-t border-line bg-surface">
       <Container className="py-12 sm:py-16">
-        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-[1.35fr_0.8fr_1fr] lg:gap-16">
+        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-[1.25fr_0.7fr_0.7fr_1fr] lg:gap-12">
           <div className="max-w-md">
             <SiteLogo size="lg" locale={locale} />
             <p className="mt-5 text-sm leading-7 text-muted">
@@ -38,6 +45,13 @@ export function SiteFooter({ locale, contact }: { locale: Locale; contact: { pho
                   </Link>
                 </li>
               ))}
+            </ul>
+          </div>
+
+          <div>
+            <h2 className="text-sm font-bold text-foreground">{locale === "en" ? "More" : "المزيد"}</h2>
+            <ul className="mt-4 grid gap-3 text-sm text-muted">
+              {secondaryNavigation.map((item) => <li key={item.href}><Link className="transition-colors hover:text-brand" href={item.href}>{item.label}</Link></li>)}
             </ul>
           </div>
 
@@ -64,7 +78,7 @@ export function SiteFooter({ locale, contact }: { locale: Locale; contact: { pho
 
         <div className="mt-12 flex flex-col gap-3 border-t border-line pt-6 text-xs text-muted sm:flex-row sm:items-center sm:justify-between">
           <p>
-            © {new Date().getFullYear()} Dentally Dental. {t.rights}.
+            © {new Date().getFullYear()} {organizationName}. {t.rights}.
           </p>
           <p>{t.clinic}</p>
         </div>

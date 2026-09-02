@@ -7,7 +7,16 @@ import { SiteNavbar } from "@/components/layout/site-navbar";
 import type { Locale } from "@/lib/locale";
 import { ui } from "@/lib/locale";
 
-export function SiteShell({ children, locale, whatsapp, contact }: { children: React.ReactNode; locale: Locale; whatsapp: string | null; contact: { phone: string | null; email: string | null; addressAr: string | null; addressEn: string | null } }) {
+type SiteShellProps = {
+  children: React.ReactNode;
+  locale: Locale;
+  whatsapp: string | null;
+  organizationName: string;
+  announcement: { text: string; url: string | null } | null;
+  contact: { phone: string | null; email: string | null; addressAr: string | null; addressEn: string | null };
+};
+
+export function SiteShell({ children, locale, whatsapp, organizationName, announcement, contact }: SiteShellProps) {
   const pathname = usePathname();
 
   if (pathname.startsWith("/admin")) {
@@ -24,10 +33,11 @@ export function SiteShell({ children, locale, whatsapp, contact }: { children: R
         {t.skip}
       </a>
       <SiteNavbar locale={locale} />
+      {announcement && (announcement.url ? <a href={announcement.url} className="block bg-brand px-4 py-2 text-center text-xs font-bold text-white transition-colors hover:bg-brand-dark">{announcement.text}</a> : <p className="bg-brand px-4 py-2 text-center text-xs font-bold text-white">{announcement.text}</p>)}
       <main id="main-content" className="flex-1">
         {children}
       </main>
-      <SiteFooter locale={locale} contact={contact} />
+      <SiteFooter locale={locale} organizationName={organizationName} contact={contact} />
       {whatsapp && /^\+?[0-9]{8,15}$/.test(whatsapp.replace(/[\s()-]/g, "")) && <a href={`https://wa.me/${whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer" className="print:hidden fixed bottom-5 end-5 z-40 rounded-full bg-brand px-5 py-3 text-xs font-bold text-white shadow-soft" aria-label={locale === "ar" ? "تواصل عبر واتساب" : "Contact us on WhatsApp"}>WhatsApp</a>}
     </>
   );

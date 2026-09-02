@@ -60,7 +60,7 @@ export default async function ServiceDetailPage({ params }: PageProps<"/services
 
           <div className="mt-10 grid items-center gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16">
             <div>
-              <p className="text-sm font-bold text-brand">{en ? "Dentally services" : "خدمات دينتالي"}</p>
+              <p className="text-sm font-bold text-brand">{service.specialty?.label || (en ? "Dentally services" : "خدمات دينتالي")}</p>
               <h1 className="mt-4 text-4xl font-bold leading-[1.2] tracking-[-0.045em] text-foreground sm:text-5xl lg:text-6xl">
                 {service.title}
               </h1>

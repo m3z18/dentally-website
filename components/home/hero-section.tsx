@@ -2,10 +2,13 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { Container } from "@/components/ui/container";
-import { getLocale } from "@/lib/i18n";
+import { getLocale, localized } from "@/lib/i18n";
+import { getSiteSettings } from "@/lib/site-content";
 
 export async function HeroSection() {
-  const en = (await getLocale()) === "en";
+  const [locale, settings] = await Promise.all([getLocale(), getSiteSettings()]);
+  const en = locale === "en";
+  const organizationName = settings ? localized(locale, settings.organization_name_ar || "مجمع دينتالي لطب الأسنان", settings.organization_name_en) : (en ? "Dentally Dental Complex" : "مجمع دينتالي لطب الأسنان");
   return (
     <section id="top" className="relative isolate overflow-hidden border-b border-line/70">
       <div className="hero-grid absolute inset-x-0 top-0 -z-20 h-[85%]" aria-hidden="true" />
@@ -18,7 +21,7 @@ export async function HeroSection() {
         <div className="motion-enter max-w-3xl">
           <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-brand/15 bg-surface/75 px-4 py-2 text-xs font-semibold text-brand-dark backdrop-blur-sm">
             <span className="size-1.5 rounded-full bg-brand" aria-hidden="true" />
-            {en ? "Dentally Dental Complex" : "مجمع دينتالي لطب الأسنان"}
+            {organizationName}
           </p>
           <h1 className="max-w-3xl text-4xl font-bold leading-[1.22] tracking-[-0.045em] text-foreground sm:text-5xl sm:leading-[1.18] lg:text-[3.75rem] xl:text-[4.35rem]">
             {en ? "Your smile deserves" : "ابتسامتك تستحق"}

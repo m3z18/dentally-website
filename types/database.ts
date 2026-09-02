@@ -291,7 +291,15 @@ export type Database = {
           updated_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["doctors"]["Insert"]>;
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "doctors_specialty_id_fkey";
+            columns: ["specialty_id"];
+            isOneToOne: false;
+            referencedRelation: "specialties";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       faq_items: {
         Row: {
@@ -421,7 +429,15 @@ export type Database = {
           updated_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["services"]["Insert"]>;
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "services_specialty_id_fkey";
+            columns: ["specialty_id"];
+            isOneToOne: false;
+            referencedRelation: "specialties";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       specialties: {
         Row: { id:string; slug:string; name_ar:string; name_en:string|null; description_ar:string|null; description_en:string|null; display_order:number; is_active:boolean; deleted_at:string|null; created_at:string; updated_at:string };

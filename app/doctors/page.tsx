@@ -6,10 +6,7 @@ import { Container } from "@/components/ui/container";
 import { getPublicDoctors } from "@/lib/doctors";
 import { getLocale } from "@/lib/i18n";
 
-export const metadata: Metadata = {
-  title: "أطباء دينتالي",
-  description: "تعرّف على أطباء مجمع دينتالي لطب الأسنان وتخصصاتهم وخبراتهم المهنية.",
-};
+export async function generateMetadata(): Promise<Metadata> { const en=(await getLocale())==="en"; return { title: en ? "Dentally doctors" : "أطباء دينتالي", description: en ? "Meet Dentally's published doctor profiles, specialties, and professional experience." : "تعرّف على ملفات أطباء مجمع دينتالي المنشورة وتخصصاتهم وخبراتهم المهنية." }; }
 
 export const dynamic = "force-dynamic";
 
@@ -53,8 +50,7 @@ export default async function DoctorsPage() {
             </div>
           ) : (
             <div className="rounded-card border border-dashed border-line bg-surface px-6 py-14 text-center">
-              <h2 className="text-xl font-bold text-foreground">{en ? "Team profiles will be published soon" : "سيتم نشر ملفات الفريق قريبًا"}</h2>
-              <p className="mt-3 text-sm leading-7 text-muted">{en ? "Profiles are reviewed before appearing on the website." : "تُراجع بيانات الأطباء قبل ظهورها في الموقع."}</p>
+              <h2 className="text-xl font-bold text-foreground">{en ? "No doctor profiles are currently published" : "لا توجد ملفات أطباء منشورة حاليًا"}</h2>
             </div>
           )}
         </Container>

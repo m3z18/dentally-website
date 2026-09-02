@@ -24,6 +24,7 @@ export function ServiceCard({ service, index, locale = "ar" }: ServiceCardProps)
       >
         {service.imageUrl?<div className="relative aspect-[16/10] overflow-hidden rounded-[1.5rem] bg-brand-soft"><Image src={service.imageUrl} alt={service.imageAlt||title} fill sizes="(min-width:1024px) 30vw, (min-width:640px) 50vw, 100vw" className="object-cover"/></div>:<ServiceVisual index={index} />}
         <div className="flex flex-1 flex-col px-2 pb-2 pt-6">
+          {service.specialty && <p className="mb-2 text-xs font-bold text-brand">{service.specialty.label}</p>}
           <h2 className="text-xl font-bold tracking-[-0.025em] text-foreground sm:text-2xl">
             {title}
           </h2>

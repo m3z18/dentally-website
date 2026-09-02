@@ -5,7 +5,7 @@ import { Container } from "@/components/ui/container";
 import { getPublicArticleCategories, getPublicArticles } from "@/lib/articles";
 import { getLocale, localized } from "@/lib/i18n";
 
-export const metadata: Metadata = { title: "المركز التوعوي | Education Center" };
+export async function generateMetadata(): Promise<Metadata> { return { title: (await getLocale()) === "en" ? "Patient Education" : "المركز التوعوي" }; }
 
 export default async function ArticlesPage({ searchParams }: PageProps<"/articles">) {
   const locale = await getLocale(); const en = locale === "en"; const params = await searchParams;

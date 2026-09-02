@@ -19,7 +19,7 @@ export function ServicesExplorer({ services, locale }: ServicesExplorerProps) {
   const filteredServices = useMemo(
     () =>
       services.filter((service) =>
-        `${service.title} ${service.description} ${service.procedures.join(" ")}`
+        `${service.title} ${service.description} ${service.specialty?.label ?? ""} ${service.procedures.join(" ")}`
           .toLocaleLowerCase("ar")
           .includes(normalizedQuery),
       ),

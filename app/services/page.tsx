@@ -6,11 +6,7 @@ import { Container } from "@/components/ui/container";
 import { getPublicServices } from "@/lib/catalog";
 import { getLocale } from "@/lib/i18n";
 
-export const metadata: Metadata = {
-  title: "خدمات الأسنان",
-  description:
-    "تعرّف على خدمات مجمع دينتالي لطب الأسنان، من الرعاية الوقائية إلى العلاجات الترميمية والتجميلية.",
-};
+export async function generateMetadata(): Promise<Metadata> { const en=(await getLocale())==="en"; return { title: en ? "Dental services" : "خدمات الأسنان", description: en ? "Explore the dental services currently published by Dentally." : "تعرّف على خدمات طب الأسنان المنشورة حاليًا لدى مجمع دينتالي." }; }
 
 export default async function ServicesPage() {
   const locale = await getLocale(); const en = locale === "en";
