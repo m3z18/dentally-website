@@ -80,10 +80,13 @@ grant select,insert,update,delete on table public.specialties,public.branches to
 drop policy if exists services_public_read on public.services;
 drop policy if exists services_admin_read on public.services;
 create policy services_public_read on public.services for select to anon,authenticated using (is_public and deleted_at is null);
-create policy services_manager_read on public.services for select to authenticated using ((select private.can_manage_content()));
+-- Preserve the original operational read access for active admin, manager, and
+-- receptionist profiles. This lets appointments resolve historical or hidden
+-- services without granting content-management access to receptionist or doctor.
+create policy services_admin_read on public.services for select to authenticated using ((select private.is_active_admin()));
 create policy services_manager_insert on public.services for insert to authenticated with check ((select private.can_manage_content()) and deleted_at is null);
 create policy services_manager_update on public.services for update to authenticated using ((select private.can_manage_content())) with check ((select private.can_manage_content()));
-revoke insert,update on table public.services from authenticated;
+revoke insert,update,delete on table public.services from authenticated;
 grant insert(id,slug,name_ar,name_en,description_ar,description_en,content_ar,content_en,image_path,image_alt_ar,image_alt_en,specialty_id,display_order,seo_title_ar,seo_title_en,seo_description_ar,seo_description_en,is_public,deleted_at) on public.services to authenticated;
 grant update(name_ar,name_en,description_ar,description_en,content_ar,content_en,image_path,image_alt_ar,image_alt_en,specialty_id,display_order,seo_title_ar,seo_title_en,seo_description_ar,seo_description_en,is_public,deleted_at) on public.services to authenticated;
 
